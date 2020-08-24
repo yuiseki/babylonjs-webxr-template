@@ -107,8 +107,9 @@ var createScene = async function (engine) {
                     if(grabbedMesh === null){
                         // 何も掴んでいない状態
                         // 掴みたいMeshを得る
-                        // MEMO: scene.meshUnderPointer を使うと左右のコントローラーの区別ができない
+                        // MEMO: scene.meshUnderPointer を使うと左右のコントローラーの区別ができないので使うべきではない
                         // MEMO: xrHelper.pointerSelection.getMeshUnderPointer(controller.profileId); は常に null
+                        // xrHelper.pointerSelection.getMeshUnderPointer() には inputSource.uniqueIdを入れるべき
                         grabbedMesh = xrHelper.pointerSelection.getMeshUnderPointer(inputSource.uniqueId);
                         console.log("grabbedMesh: "+grabbedMesh);
                         if(grabbedMesh !== null){
