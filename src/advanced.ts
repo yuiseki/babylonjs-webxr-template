@@ -1,6 +1,6 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
-import { WebXRControllerPhysics, WebXRControllerPointerSelection, WebXRMotionControllerTeleportation } from '@babylonjs/core';
+import { WebXRProfiledMotionController, WebXRControllerPhysics, WebXRControllerPointerSelection, WebXRMotionControllerTeleportation } from '@babylonjs/core';
 
 var canvas:HTMLCanvasElement = document.getElementById("renderCanvas") as HTMLCanvasElement;
 
@@ -67,9 +67,13 @@ var createScene = async function (engine) {
     // テスト用のオブジェクト
     var box1 = BABYLON.MeshBuilder.CreateBox("box1", {size:1}, scene);
     box1.position = new BABYLON.Vector3(1, 1, 1);
+    // 殴ると回転する
+    box1.onCollideObservable.add((eventData, eventState)=>{
+        box1.addRotation(box1.rotation.x+1, box1.rotation.y+1, box1.rotation.z+1);
+    });
 
     var sphere1 = BABYLON.MeshBuilder.CreateSphere("sphere1", {diameter:2}, scene);
-    sphere1.position = new BABYLON.Vector3(-1, 1, -1); 
+    sphere1.position = new BABYLON.Vector3(-1, 1, 1); 
 
     
     // XRが動く環境かチェック
@@ -84,11 +88,21 @@ var createScene = async function (engine) {
         floorMeshes: [ground1]
     });
 
-    const fm = new BABYLON.WebXRFeaturesManager(xrHelper.baseExperience.sessionManager);
-    fm.enableFeature(WebXRControllerPhysics.Name, "latest");
-    fm.enableFeature(WebXRControllerPointerSelection.Name, "latest");
-    fm.enableFeature(WebXRMotionControllerTeleportation.Name, "latest");
-    
+    // 掴む, 離す
+    xrHelper.input.onControllerAddedObservable.add((inputSource)=>{
+        inputSource.onMotionControllerInitObservable.add((controller:WebXRProfiledMotionController)=>{
+            const squeezeComponent = controller.getComponent("xr-standard-squeeze");
+            squeezeComponent.onButtonStateChangedObservable.add((component)=>{
+                if(component.value > 0.8 && component.pressed){
+                    if(xrHelper.pointerSelection.getMeshUnderPointer){
+                        const mesh = xrHelper.pointerSelection.getMeshUnderPointer(controller.profileId);
+                        mesh.position = controller.rootMesh.position;
+                    }
+                }
+            });
+        });
+    });
+
     return scene;
 };
 
