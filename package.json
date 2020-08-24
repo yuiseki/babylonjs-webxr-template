@@ -1,5 +1,5 @@
 {
-  "name": "babylonjs_gui",
+  "name": "babylonjs-webxr-template",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,9 +8,11 @@
     "@babylonjs/gui": "^4.1.0",
     "@babylonjs/materials": "^4.1.0",
     "@types/babylonjs": "^2.4.1",
+    "cannon": "^0.6.2",
     "open": "^7.2.0"
   },
   "devDependencies": {
+    "@types/cannon": "^0.1.4",
     "express": "^4.17.1",
     "ts-loader": "^8.0.2",
     "typescript": "^4.0.2",
@@ -19,7 +21,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
-    "start": "adb reverse tcp:8080 tcp:8080 && webpack-dev-server",
+    "start": "adb reverse tcp:8080 tcp:8080 && webpack && http-server",
     "kill": "taskkill.exe /f /im node.exe;",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

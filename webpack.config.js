@@ -29,5 +29,6 @@ function createConfig(filename){
 module.exports = [
   createConfig('basic'),
   createConfig('simple'),
-  createConfig('advanced')
+  createConfig('grab'),
+  createConfig('collision'),
 ]
