@@ -33,10 +33,10 @@ var createScene = async function (engine) {
     let i = 0;
     while( i < count){
         i++;
-        var box = BABYLON.MeshBuilder.CreateBox("box"+i, {size:0.0001}, scene);
+        var box = BABYLON.MeshBuilder.CreateBox("box"+i, {size:0.1}, scene);
         box.position = createRandomVector3();
 
-        var sphere = BABYLON.MeshBuilder.CreateSphere("sphere"+i, {diameter:0.0001}, scene);
+        var sphere = BABYLON.MeshBuilder.CreateSphere("sphere"+i, {diameter:0.1}, scene);
         sphere.position = createRandomVector3();
     }
 
