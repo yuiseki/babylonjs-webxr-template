@@ -18,50 +18,8 @@ var createScene = async function (engine) {
     environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
     // 地面
     var ground1 = BABYLON.MeshBuilder.CreateGround("ground1", {width:50, height:50, subdivisions:4}, scene);
-    
-    // ログ出力用のTextBlock
-    var planeX = BABYLON.MeshBuilder.CreatePlane("planeX", {size: 1});
-    planeX.position = new BABYLON.Vector3(1.5, 1, 0);
-    var advancedTextureX = GUI.AdvancedDynamicTexture.CreateForMesh(planeX);
-    var panelX = new GUI.StackPanel();
-    advancedTextureX.addControl(panelX);
-    var headerX = new GUI.TextBlock();
-    headerX.text = "Text Block X";
-    headerX.height = "150px";
-    headerX.width = "1400px";
-    headerX.color = "white";
-    headerX.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-    headerX.fontSize = "60";
-    panelX.addControl(headerX);
 
-    var planeY = BABYLON.MeshBuilder.CreatePlane("planeY", {size: 1});
-    planeY.position = new BABYLON.Vector3(0, 1.5, 0);
-    var advancedTextureY = GUI.AdvancedDynamicTexture.CreateForMesh(planeY);
-    var panelY = new GUI.StackPanel();
-    advancedTextureY.addControl(panelY);
-    var headerY = new GUI.TextBlock();
-    headerY.text = "Text Block Y";
-    headerY.height = "150px";
-    headerY.width = "1400px";
-    headerY.color = "white";
-    headerY.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-    headerY.fontSize = "60";
-    panelY.addControl(headerY);
-
-    var planeZ = BABYLON.MeshBuilder.CreatePlane("planeZ", {size: 1});
-    planeZ.position = new BABYLON.Vector3(0, 1, 1.5);
-    var advancedTextureZ = GUI.AdvancedDynamicTexture.CreateForMesh(planeZ);
-    var panelZ = new GUI.StackPanel();
-    advancedTextureZ.addControl(panelZ);
-    var headerZ = new GUI.TextBlock();
-    headerZ.text = "Text Block Z";
-    headerZ.height = "150px";
-    headerZ.width = "1400px";
-    headerZ.color = "white";
-    headerZ.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-    headerZ.fontSize = "60";
-    panelZ.addControl(headerZ);
-
+    // ランダムなVector3を生成する
     const createRandomVector3 = () => {
         // 1から5までのfloatをランダムに得る
         const x = (Math.round(Math.random())*2-1)*Math.random()*5;
@@ -70,7 +28,7 @@ var createScene = async function (engine) {
         return new BABYLON.Vector3(x, y, z);
     }
 
-    // テスト用のオブジェクトをランダムに配置する
+    // テスト用のオブジェクトをランダムに20個配置する
     const count = Math.round(Math.random()*20);
     let i = 0;
     while( i < count){
