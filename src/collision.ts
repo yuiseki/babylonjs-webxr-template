@@ -5,6 +5,7 @@ import * as CANNON from 'cannon';
 
 var canvas:HTMLCanvasElement = document.getElementById("renderCanvas") as HTMLCanvasElement;
 
+let pickedColor = null;
 var createScene = async function (engine) {
     var scene = new BABYLON.Scene(engine);
     // 適当な物理エンジン
@@ -69,6 +70,66 @@ var createScene = async function (engine) {
         floorMeshes: [ground1]
     });
 
+    var plane = BABYLON.MeshBuilder.CreatePlane("plane", {size:1});
+    plane.position = new BABYLON.Vector3(0.4, 0.5, 0.4)
+    var advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(plane);
+    var panel = new GUI.StackPanel();    
+    advancedTexture.addControl(panel);  
+    var header = new GUI.TextBlock();
+    header.text = "Color Picker";
+    header.height = "100px";
+    header.color = "white";
+    header.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    header.fontSize = "120"
+    panel.addControl(header); 
+    var picker = new GUI.ColorPicker();
+    picker.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+    picker.height = "350px";
+    picker.width = "350px";
+    picker.onValueChangedObservable.add(function(value) {
+        pickedColor = value;
+    });
+    panel.addControl(picker);
+
+    xrHelper.input.onControllerAddedObservable.add((inputSource)=>{
+        inputSource.onMotionControllerInitObservable.add((controller)=>{
+            const mainTriggerComponent = controller.getComponent("xr-standard-trigger");
+            mainTriggerComponent.onButtonStateChangedObservable.add((component) => {
+                if(component.value > 0.9 && component.pressed) {
+                    if(controller.rootMesh === undefined){
+                        return;
+                    }
+                    // トリガーが引かれたら球体を生成して発射する
+                    // 球体生成
+                    var sphere = BABYLON.MeshBuilder.CreateSphere("sphere"+(new Date().getTime()), {diameter:0.1}, scene);
+                    sphere.position = controller.rootMesh.getAbsolutePosition();
+                    var material = new BABYLON.StandardMaterial("material"+(new Date().getTime()), scene);
+                    if(pickedColor !== null){
+                        material.diffuseColor = pickedColor;
+                        material.specularColor = pickedColor;
+                        material.emissiveColor = pickedColor;
+                        material.ambientColor = pickedColor;
+                        sphere.material = material;
+                    }
+                    // 球体に物理エンジン適用
+                    sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 5 }, scene);
+                    // 発射準備
+                    // コントローラーとおなじ方向に発射したい
+                    let ray: BABYLON.Ray = new BABYLON.Ray(new BABYLON.Vector3(), new BABYLON.Vector3());
+                    inputSource.getWorldPointerRayToRef(ray, true);
+                    var forceDirection = new BABYLON.Vector3(ray.direction.x, ray.direction.y-0.5, ray.direction.z);
+                    var forceMagnitude = 30;
+                    // 発射
+                    sphere.physicsImpostor.applyImpulse(forceDirection.scale(forceMagnitude), sphere.getAbsolutePosition());
+                    physicsRoot.addChild(sphere);
+                }
+            })
+        });}
+    );
+
+
+    // コントローラーで他のオブジェクトを殴りたいけどできていない
+    /*
     var rightSphere = BABYLON.MeshBuilder.CreateSphere("sphere-right", {diameter:1}, scene);
     rightSphere.physicsImpostor = new BABYLON.PhysicsImpostor(rightSphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 5 }, scene);
     physicsRoot.addChild(rightSphere)
@@ -79,16 +140,14 @@ var createScene = async function (engine) {
 
     xrHelper.input.onControllerAddedObservable.add((inputSource)=>{
         inputSource.onMotionControllerInitObservable.add((controller)=>{
-            controller.onModelLoadedObservable.add((model)=>{
-                console.log("model: ", model);
-                if(model.handness === "right"){
-                    model.rootMesh = rightSphere;
-                }else{
-                    model.rootMesh = leftSphere;
-                }
-            });
+            if(controller.handness === "right"){
+                controller.rootMesh = rightSphere;
+            }else{
+                controller.rootMesh = leftSphere;
+            }
         });
     });
+    */
 
     return scene;
 };
