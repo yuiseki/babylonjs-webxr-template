@@ -1,5 +1,4 @@
 import * as BABYLON from '@babylonjs/core';
-import * as GUI from '@babylonjs/gui';
 import { WebXRProfiledMotionController, WebXRControllerPhysics, WebXRControllerPointerSelection, WebXRMotionControllerTeleportation, WebXRInputSource } from '@babylonjs/core';
 
 var canvas:HTMLCanvasElement = document.getElementById("renderCanvas") as HTMLCanvasElement;

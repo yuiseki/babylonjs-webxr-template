@@ -2,7 +2,6 @@ import * as BABYLON from '@babylonjs/core';
 import { WebXRProfiledMotionController } from "@babylonjs/core";
 import { WebXRInputSource } from "@babylonjs/core";
 
-
 export default abstract class AbstractOculusQuestController{
   rightInputSource: WebXRInputSource;
   leftInputSource: WebXRInputSource;
@@ -10,14 +9,10 @@ export default abstract class AbstractOculusQuestController{
   leftController: WebXRProfiledMotionController;
 
   constructor(xrHelper){
-    xrHelper.input.onControllerAddedObservable.add((inputSource) => {
-      if(inputSource.handness === "right"){
-        this.rightInputSource = inputSource;
-      }else{
-        this.leftInputSource = inputSource;
-      }
+    xrHelper.input.onControllerAddedObservable.add((inputSource:WebXRInputSource) => {
       inputSource.onMotionControllerInitObservable.add((controller: WebXRProfiledMotionController) => {
         if(controller.handness === "right"){
+          this.rightInputSource = inputSource;
           this.rightController = controller;
           // 右手にしかないボタン
           const aButtonComponent = controller.getComponent("a-button");
@@ -33,6 +28,7 @@ export default abstract class AbstractOculusQuestController{
             }
           });
         }else{
+          this.leftInputSource = inputSource;
           this.leftController = controller;
           // 左手にしかないボタン
           const xButtonComponent = controller.getComponent("x-button");
@@ -105,12 +101,19 @@ export default abstract class AbstractOculusQuestController{
   abstract onLeftThumbStickPressed(controller, component)
 
   getControllerPosition(controller){
+    if(controller.rootMesh === undefined){
+      return new BABYLON.Vector3(0, 0, 0);
+    }
     return controller.rootMesh.absolutePosition;
   }
 
   getControllerDirection(controller){
     let ray: BABYLON.Ray = new BABYLON.Ray(new BABYLON.Vector3(), new BABYLON.Vector3());
-    controller.inputSource.getWorldPointerRayToRef(ray, true);
+    if(controller.handness === "right"){
+      this.rightInputSource.getWorldPointerRayToRef(ray, true);
+    }else{
+      this.leftInputSource.getWorldPointerRayToRef(ray, true);
+    }
     return ray.direction;
   }
 

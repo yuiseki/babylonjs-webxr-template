@@ -6,6 +6,7 @@ function createConfig(filename){
     entry: {
         app: "./src/"+filename+".ts"
     },
+    devtool: 'source-map',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: filename+".js"
@@ -13,8 +14,10 @@ function createConfig(filename){
     resolve: {
         extensions: ['.ts', '.tsx', '.js']
     },
-    devtool: 'source-map',
     plugins: [ ],
+    externals: {
+      "cannon": true
+    },
     module: {
         rules: [{
             test: /\.tsx?$/,
@@ -31,4 +34,5 @@ module.exports = [
   createConfig('simple'),
   createConfig('grab'),
   createConfig('collision'),
+  createConfig('libtest'),
 ]

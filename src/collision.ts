@@ -1,17 +1,16 @@
 import * as BABYLON from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui';
-import { WebXRProfiledMotionController, WebXRControllerPhysics } from '@babylonjs/core';
 import * as CANNON from 'cannon';
 
 var canvas:HTMLCanvasElement = document.getElementById("renderCanvas") as HTMLCanvasElement;
 
 /**
- * 適当な環境を初期化する
- * 
- * @param scene 
- * @returns ground1
+ * 最後に選択された色
  */
-const createEnv = (scene) => {
+let pickedColor = null;
+
+var createScene = async function (engine) {
+    var scene = new BABYLON.Scene(engine);
     // 適当な光源
     var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
     // 適当なカメラ
@@ -24,80 +23,8 @@ const createEnv = (scene) => {
     environment.setMainColor(BABYLON.Color3.FromHexString("#74b9ff"));
     // 地面
     var ground1 = BABYLON.Mesh.CreateGround("ground1", 6, 6, 2, scene);
-    ground1.physicsImpostor = new BABYLON.PhysicsImpostor(ground1, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.5, restitution: 0.7 }, scene);
-    return ground1;
-}
 
-/**
- * 適当な物理エンジンを初期化する
- * 
- * @param scene
- * @returns physicsRoot
- */
-const createPhysics = (scene) => {
-    // 適当な物理エンジン
-    var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
-    scene.enablePhysics(gravityVector);
-    // なんか必要らしい
-    var physicsRoot = new BABYLON.Mesh("physicsRoot", scene);
-    physicsRoot.position.y -= 0.9;
-    physicsRoot.scaling.scaleInPlace(1.0)
-    physicsRoot.physicsImpostor = new BABYLON.PhysicsImpostor(physicsRoot, BABYLON.PhysicsImpostor.NoImpostor, { mass: 3 }, scene);
-    return physicsRoot;
-}
-
-/**
- * ランダムなVector3を生成する
- * 
- * @returns BABYLON.Vector3
- */
-const createRandomVector3 = () => {
-    // 1から3までのfloatをランダムに得る
-    const x = (Math.round(Math.random())*2-1)*Math.random()*3;
-    const y = Math.random()*5;
-    const z = (Math.round(Math.random())*2-1)*Math.random()*3;
-    return new BABYLON.Vector3(x, y, z);
-}
-
-/**
- * テスト用のオブジェクトをランダムに100個配置する
- * 各オブジェクトに物理演算するように指定する
- *
- * @param scene 
- * @param physicsRoot 
- */
-const createRandomObjects = (scene, physicsRoot) => {
-    const count = Math.random()*100;
-    let i = 0;
-    while( i < count){
-        i++;
-        // 四角形を生成
-        var box = BABYLON.MeshBuilder.CreateBox("box"+i, {size:0.1}, scene);
-        // 四角形の位置を指定
-        box.position = createRandomVector3();
-        // 物理演算する指定
-        box.physicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 5 }, scene);
-        physicsRoot.addChild(box)
-
-        // 球体を生成
-        var sphere = BABYLON.MeshBuilder.CreateSphere("sphere"+i, {diameter:0.1}, scene);
-        // 球体の位置を指定
-        sphere.position = createRandomVector3();
-        // 物理演算する指定
-        sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 5 }, scene);
-        physicsRoot.addChild(sphere)
-    }
-}
-
-/**
- * 最後に選択された色
- */
-let pickedColor = null;
-
-/**
- * 色を選択するGUI、カラーピッカーを設置する
- */
-const createColorPicker = () => {
+    // 色を選択するGUIを追加
     var plane = BABYLON.MeshBuilder.CreatePlane("plane", {size:1});
     plane.position = new BABYLON.Vector3(0.4, 0.5, 0.4)
     var advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(plane);
@@ -121,15 +48,66 @@ const createColorPicker = () => {
         pickedColor = value;
     });
     panel.addControl(picker);
-}
 
-var createScene = async function (engine) {
-    var scene = new BABYLON.Scene(engine);
-    var ground1 = createEnv(scene);
-    var physicsRoot = createPhysics(scene);
-    
+
+    // 適当な物理エンジン
+    var gravityVector = new BABYLON.Vector3(0,-9.81, 0);
+    scene.enablePhysics(gravityVector);
+    // なんか必要らしい
+    var physicsRoot = new BABYLON.Mesh("physicsRoot", scene);
+    physicsRoot.position.y -= 0.9;
+    physicsRoot.scaling.scaleInPlace(1.0)
+    physicsRoot.physicsImpostor = new BABYLON.PhysicsImpostor(physicsRoot, BABYLON.PhysicsImpostor.NoImpostor, { mass: 3 }, scene);
+
+    // 地面に物理判定を与える
+    ground1.physicsImpostor = new BABYLON.PhysicsImpostor(ground1, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.5, restitution: 0.7 }, scene);
+
+
+    /**
+     * ランダムなVector3を生成する
+     * 
+     * @returns BABYLON.Vector3
+     */
+    const createRandomVector3 = () => {
+        // 1から3までのfloatをランダムに得る
+        const x = (Math.round(Math.random())*2-1)*Math.random()*3;
+        const y = Math.random()*5;
+        const z = (Math.round(Math.random())*2-1)*Math.random()*3;
+        return new BABYLON.Vector3(x, y, z);
+    }
+
+    /**
+     * テスト用のオブジェクトをランダムに100個配置する
+     * 各オブジェクトに物理演算するように指定する
+     *
+     * @param scene 
+     * @param physicsRoot 
+     */
+    const createRandomObjects = (scene, physicsRoot) => {
+        const count = Math.random()*100;
+        let i = 0;
+        while( i < count){
+            i++;
+            // 四角形を生成
+            var box = BABYLON.MeshBuilder.CreateBox("box"+i, {size:0.1}, scene);
+            // 四角形の位置を指定
+            box.position = createRandomVector3();
+            // 物理演算する指定
+            box.physicsImpostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 5 }, scene);
+            physicsRoot.addChild(box)
+
+            // 球体を生成
+            var sphere = BABYLON.MeshBuilder.CreateSphere("sphere"+i, {diameter:0.1}, scene);
+            // 球体の位置を指定
+            sphere.position = createRandomVector3();
+            // 物理演算する指定
+            sphere.physicsImpostor = new BABYLON.PhysicsImpostor(sphere, BABYLON.PhysicsImpostor.SphereImpostor, { mass: 5 }, scene);
+            physicsRoot.addChild(sphere)
+        }
+    }
     createRandomObjects(scene, physicsRoot);
-    createColorPicker();
+
+
 
     // XRが動く環境かチェック
     const xrSupported = await BABYLON.WebXRSessionManager.IsSessionSupportedAsync('immersive-vr');
