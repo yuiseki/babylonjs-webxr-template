@@ -3,12 +3,14 @@ import { WebXRProfiledMotionController } from "@babylonjs/core";
 import { WebXRInputSource } from "@babylonjs/core";
 
 export default abstract class AbstractOculusQuestController{
+  xrHelper: any;
   rightInputSource: WebXRInputSource;
   leftInputSource: WebXRInputSource;
   rightController: WebXRProfiledMotionController;
   leftController: WebXRProfiledMotionController;
 
   constructor(xrHelper){
+    this.xrHelper = xrHelper;
     xrHelper.input.onControllerAddedObservable.add((inputSource:WebXRInputSource) => {
       inputSource.onMotionControllerInitObservable.add((controller: WebXRProfiledMotionController) => {
         if(controller.handness === "right"){
@@ -117,12 +119,24 @@ export default abstract class AbstractOculusQuestController{
     return ray.direction;
   }
 
+  getMeshUnderControllerPointer(controller){
+    if(controller.handness === "right"){
+      return this.xrHelper.pointerSelection.getMeshUnderPointer(this.rightInputSource.uniqueId);
+    }else {
+      return this.xrHelper.pointerSelection.getMeshUnderPointer(this.leftInputSource.uniqueId);
+    }
+  }
+
   getRightControllerPosition(){
     return this.getControllerPosition(this.rightController);
   }
 
   getRightControllerDirection(){
-    return this.getControllerDirection(this.rightController)
+    return this.getControllerDirection(this.rightController);
+  }
+
+  getMeshUnderRightControllerPointer(){
+    return this.getMeshUnderControllerPointer(this.rightController);
   }
 
   getLeftControllerPosition(){
@@ -130,6 +144,10 @@ export default abstract class AbstractOculusQuestController{
   }
 
   getLeftControllerDirection(){
-    return this.getControllerDirection(this.leftController)
+    return this.getControllerDirection(this.leftController);
+  }
+
+  getMeshUnderLeftContollerPointer(){
+    return this.getMeshUnderControllerPointer(this.leftController);
   }
 }

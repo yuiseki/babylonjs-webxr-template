@@ -11,8 +11,8 @@ var canvas:HTMLCanvasElement = document.getElementById("renderCanvas") as HTMLCa
  * AbstractOculusQuestControllerを継承してここでコントローラーで実際にやりたい挙動を実装する
  */
 class OculusQuestController extends AbstractOculusQuestController {
-  scene: any;
-  physicsRoot: any;
+  scene: BABYLON.Scene;
+  physicsRoot: BABYLON.Mesh;
   textBlock: GUI.TextBlock;
   
   constructor(xrHelper, scene, physicsRoot, textBlock){
