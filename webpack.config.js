@@ -30,9 +30,11 @@ function createConfig(filename){
 }
 
 module.exports = [
-  createConfig('basic'),
-  createConfig('simple'),
-  createConfig('grab'),
-  createConfig('collision'),
-  createConfig('libtest'),
+  //createConfig('basic'),
+  //createConfig('simple'),
+  //createConfig('grab'),
+  //createConfig('collision'),
+  //createConfig('libtest'),
+  createConfig('inochi'),
+  //createConfig('stage'),
 ]

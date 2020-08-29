@@ -22,7 +22,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
-    "start": "adb reverse tcp:8080 tcp:8080 && npm run build:ts && http-server",
+    "start": "adb reverse tcp:8080 tcp:8080 && npm run build:ts && http-server -p 8000",
     "build:ts": "cross-env NODE_OPTIONS=--max_old_space_size=2048 webpack --progress --config ./webpack.config.js --hide-modules",
     "kill": "taskkill.exe /f /im node.exe;",
     "test": "echo \"Error: no test specified\" && exit 1"

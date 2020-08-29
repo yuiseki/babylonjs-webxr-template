@@ -1,4 +1,4 @@
-import * as BABYLON from '@babylonjs/core';
+import { Ray, Vector3 } from '@babylonjs/core';
 import { WebXRProfiledMotionController } from "@babylonjs/core";
 import { WebXRInputSource } from "@babylonjs/core";
 
@@ -84,33 +84,108 @@ export default abstract class AbstractOculusQuestController{
     });
   }
 
+  /**
+   * Aボタンが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onAButtonPressed(controller, component)
+  /**
+   * Bボタンが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onBButtonPressed(controller, component)
 
+  /**
+   * Xボタンが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onXButtonPressed(controller, component)
+  /**
+   * Yボタンが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onYButtonPressed(controller, component)
 
+  /**
+   * 左右どちらかのトリガーが引かれたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onAnyTriggered(controller, component)
+  /**
+   * 右コントローラーのトリガーが引かれたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onRightTriggered(controller, component)
+  /**
+   * 左コントローラーのトリガーが引かれたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onLeftTriggered(controller, component)
 
+  /**
+   * 左右どちらかの中指の絞りボタンが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onAnySqueezed(controller, component)
+  /**
+   * 右コントローラーの絞りボタンが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onRightSqueezed(controller, component)
+  /**
+   * 左コントローラーの絞りボタンが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onLeftSqueezed(controller, component)
 
+  /**
+   * 左右どちらかのサムスティックが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onAnyThumbStickPressed(controller, component)
+  /**
+   * 右コントローラーのサムスティックが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onRightThumbStickPressed(controller, component)
+  /**
+   * 左コントローラーのサムスティックが押されたときの処理を実装する
+   * @param controller 
+   * @param component 
+   */
   abstract onLeftThumbStickPressed(controller, component)
 
+  /**
+   * 指定されたコントローラーの絶対位置を得る
+   * @param controller 右または左コントローラー
+   * @returns BABYLON.Vector3
+   */
   getControllerPosition(controller){
     if(controller.rootMesh === undefined){
-      return new BABYLON.Vector3(0, 0, 0);
+      return new Vector3(0, 0, 0);
     }
     return controller.rootMesh.absolutePosition;
   }
 
+  /**
+   * 指定されたコントローラーの絶対方向を得る
+   * @param controller 右または左コントローラー
+   * @returns BABYLON.Vector3
+   */
   getControllerDirection(controller){
-    let ray: BABYLON.Ray = new BABYLON.Ray(new BABYLON.Vector3(), new BABYLON.Vector3());
+    let ray: Ray = new Ray(new Vector3(), new Vector3());
     if(controller.handness === "right"){
       this.rightInputSource.getWorldPointerRayToRef(ray, true);
     }else{
@@ -119,6 +194,11 @@ export default abstract class AbstractOculusQuestController{
     return ray.direction;
   }
 
+  /**
+   * 指定されたコントローラーが指しているオブジェクトを得る
+   * @param controller 右または左コントローラー
+   * @returns BABYLON.Mesh
+   */
   getMeshUnderControllerPointer(controller){
     if(controller.handness === "right"){
       return this.xrHelper.pointerSelection.getMeshUnderPointer(this.rightInputSource.uniqueId);
@@ -127,26 +207,50 @@ export default abstract class AbstractOculusQuestController{
     }
   }
 
+  /**
+   * 右コントローラーの絶対位置を得る
+   * @returns BABYLON.Vector3
+   */
   getRightControllerPosition(){
     return this.getControllerPosition(this.rightController);
   }
 
+  /**
+   * 右コントローラーの絶対方向を得る
+   * @returns BABYLON.Vector3
+   */
   getRightControllerDirection(){
     return this.getControllerDirection(this.rightController);
   }
 
+  /**
+   * 右コントローラーが指しているオブジェクトを得る
+   * @returns BABYLON.Mesh
+   */
   getMeshUnderRightControllerPointer(){
     return this.getMeshUnderControllerPointer(this.rightController);
   }
 
+  /**
+   * 左コントローラーの絶対位置を得る
+   * @returns BABYLON.Vector3
+   */
   getLeftControllerPosition(){
     return this.getControllerPosition(this.leftController);
   }
 
+  /**
+   * 左コントローラーの絶対方向を得る
+   * @returns BABYLON.Vector3
+   */
   getLeftControllerDirection(){
     return this.getControllerDirection(this.leftController);
   }
 
+  /**
+   * 左コントローラーが指しているオブジェクトを得る
+   * @returns BABYLON.Mesh
+   */
   getMeshUnderLeftContollerPointer(){
     return this.getMeshUnderControllerPointer(this.leftController);
   }
