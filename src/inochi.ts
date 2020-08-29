@@ -83,9 +83,10 @@ const createInochiNoKagayaki = (scene, center: Vector3) => {
 
 const createRandomVector3 = () => {
   // x, y, z の float をランダムに得る
-  const x = (Math.round(Math.random())*2-1)*Math.random()*1;
-  const y = Math.random()*2;
-  const z = Math.random()*3;
+  const scatter = 2.5 // ばらつき具合
+  const x = scatter * (Math.round(Math.random())*2-1)*Math.random()*1;
+  const y = scatter * 1/2 * Math.random()*2;
+  const z = scatter * Math.random()*3;
   return new Vector3(x, y, z);
 }
 
